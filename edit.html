@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>চেতনা নিউজ — সম্পাদনা ড্যাশবোর্ড</title>
+
+<!-- ============================================================
+     AUTHENTICATION CHECK
+     লগইন করা না থাকলে সরাসরি login.html পেজে রিডাইরেক্ট করবে
+============================================================= -->
+<script>
+  if (sessionStorage.getItem("csnAdminAuthed") !== "true") {
+    window.location.href = "index.html";
+  }
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#12183a;
+    --ink-2:#1c2454;
+    --paper:#f2f1ec;
+    --card:#ffffff;
+    --gold:#b9903f;
+    --gold-soft:#f3e8cf;
+    --gold-text:#7a5b17;
+    --district-soft:#e7ecf5;
+    --district-text:#2c3a68;
+    --danger:#a7362c;
+    --danger-soft:#f6e2e0;
+    --success:#2f6f52;
+    --success-soft:#e1efe7;
+    --text:#1d1f2b;
+    --text-muted:#6b6f80;
+    --border:#e3e0d6;
+    --radius:14px;
+    --shadow:0 10px 28px rgba(18,24,58,0.08);
+    --font-display:'Noto Serif Bengali', Georgia, serif;
+    --font-body:'Hind Siliguri','Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text);
+    font-family:var(--font-body);
+  }
+  :focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    background:linear-gradient(180deg,var(--ink),var(--ink-2));
+    color:#fff;
+    padding:30px 20px 24px;
+    text-align:center;
+  }
+  .masthead h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(24px,4vw,32px);
+    margin:0;
+    letter-spacing:0.5px;
+  }
+  .masthead p{
+    margin:8px 0 0;
+    font-size:12px;
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    color:rgba(255,255,255,0.65);
+  }
+  .masthead::after{
+    content:'';
+    display:block;
+    width:64px;
+    height:3px;
+    background:var(--gold);
+    margin:16px auto 0;
+    border-radius:2px;
+  }
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{
+    max-width:1200px;
+    margin:24px auto 0;
+    padding:0 20px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .search-box{
+    position:relative;
+    flex:1;
+    min-width:220px;
+  }
+  .search-box input{
+    width:100%;
+    padding:11px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-family:var(--font-body);
+    font-size:14px;
+    background:#fff;
+    transition:border-color .15s;
+  }
+  .search-box input:focus{border-color:var(--gold);}
+  .btn-refresh{
+    padding:11px 18px;
+    border-radius:10px;
+    border:1px solid var(--ink);
+    background:#fff;
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .btn-refresh:hover{background:var(--ink); color:#fff;}
+  .count{
+    font-size:13px;
+    color:var(--text-muted);
+    white-space:nowrap;
+  }
+
+  /* ---------- States ---------- */
+  .state-panel{
+    max-width:520px;
+    margin:60px auto;
+    text-align:center;
+    padding:0 20px;
+    display:none;
+  }
+  .state-panel .glyph{font-size:34px; margin-bottom:10px;}
+  .state-panel h2{font-family:var(--font-display); font-size:20px; margin:0 0 8px;}
+  .state-panel p{color:var(--text-muted); font-size:14px; line-height:1.6; margin:0 0 18px;}
+  .btn-retry{
+    padding:10px 22px;
+    border-radius:10px;
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .btn-retry:hover{background:var(--ink-2);}
+
+  /* ---------- Grid & Cards ---------- */
+  .container{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:22px;
+    max-width:1200px;
+    margin:26px auto 60px;
+    padding:0 20px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    opacity:0;
+    transform:translateY(8px);
+    animation:rise .35s ease forwards;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .card:hover{transform:translateY(-4px); box-shadow:0 16px 32px rgba(18,24,58,0.12);}
+  @keyframes rise{to{opacity:1; transform:translateY(0);}}
+
+  .card-kicker{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:16px 18px 0;}
+  .card-date{margin-left:auto; font-size:12px; color:var(--text-muted); white-space:nowrap;}
+  .pill{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border-radius:20px;
+  }
+  .pill-category{background:var(--gold-soft); color:var(--gold-text);}
+  .pill-district{background:var(--district-soft); color:var(--district-text);}
+
+  .card h3{
+    font-family:var(--font-display);
+    font-size:19px;
+    line-height:1.45;
+    margin:12px 18px 6px;
+    color:var(--ink);
+  }
+  .card p{
+    font-size:14px;
+    color:var(--text-muted);
+    line-height:1.65;
+    margin:0 18px 18px;
+    flex-grow:1;
+  }
+  .card-footer{
+    border-top:1px solid var(--border);
+    background:#faf9f6;
+    padding:12px 14px;
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+  }
+  .btn{
+    padding:8px 16px;
+    border-radius:8px;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .btn-outline-edit{background:#fff; border:1px solid var(--success); color:var(--success);}
+  .btn-outline-edit:hover{background:var(--success); color:#fff;}
+  .btn-outline-delete{background:#fff; border:1px solid var(--danger); color:var(--danger);}
+  .btn-outline-delete:hover{background:var(--danger); color:#fff;}
+
+  /* ---------- Skeleton ---------- */
+  .skeleton-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    height:190px;
+    padding:18px;
+  }
+  .skeleton-line{
+    background:linear-gradient(90deg,#ecebe6 25%,#f5f4f0 37%,#ecebe6 63%);
+    background-size:400% 100%;
+    animation:shimmer 1.4s ease infinite;
+    border-radius:6px;
+  }
+  @keyframes shimmer{0%{background-position:100% 0;} 100%{background-position:0 0;}}
+  .sk-pill{width:70px; height:18px; display:inline-block; border-radius:20px; margin-right:8px;}
+  .sk-title{height:20px; width:85%; margin-top:16px;}
+  .sk-text{height:13px; width:95%; margin-top:12px;}
+  .sk-text.short{width:60%;}
+  .loading-hint{
+    grid-column:1/-1;
+    text-align:center;
+    font-size:13px;
+    color:var(--text-muted);
+    margin-top:-6px;
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(15,18,40,0.55);
+    align-items:center; justify-content:center;
+    z-index:1000;
+    padding:16px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{
+    background:#fff;
+    width:100%;
+    max-width:460px;
+    border-radius:16px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+    padding:26px;
+    max-height:90vh;
+    overflow-y:auto;
+  }
+  .modal-box h3{
+    font-family:var(--font-display);
+    margin:0 0 16px;
+    padding-bottom:12px;
+    border-bottom:2px solid var(--paper);
+    color:var(--ink);
+    font-size:20px;
+  }
+  .field{margin-top:14px;}
+  .field label{display:block; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px;}
+  .field .hint{display:block; font-size:12px; color:var(--text-muted); margin-top:5px; font-weight:400;}
+  .field input, .field textarea, .field select{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-family:inherit;
+    font-size:14px;
+    background:#fff;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--gold);}
+  .field-row{display:flex; gap:14px;}
+  .field-row .field{flex:1;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:24px;}
+  .btn-cancel{background:#fff; border:1px solid var(--border); color:var(--text);}
+  .btn-cancel:hover{background:#f2f1ec;}
+  .btn-save{background:var(--ink); border:1px solid var(--ink); color:#fff; padding:10px 20px;}
+  .btn-save:hover{background:var(--ink-2);}
+  .btn-save:disabled{opacity:0.6; cursor:default;}
+  .btn-danger-solid{background:var(--danger); border:1px solid var(--danger); color:#fff; padding:10px 20px;}
+  .btn-danger-solid:hover{background:#8a2c23;}
+
+  .confirm-box p{font-size:14px; color:var(--text-muted); line-height:1.6;}
+  .confirm-box strong{color:var(--ink);}
+
+  /* ---------- Toasts ---------- */
+  .toast-stack{
+    position:fixed;
+    bottom:20px; right:20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    z-index:2000;
+  }
+  .toast{
+    min-width:220px;
+    max-width:320px;
+    padding:12px 16px;
+    border-radius:10px;
+    font-size:13.5px;
+    font-weight:600;
+    color:#fff;
+    box-shadow:0 10px 24px rgba(0,0,0,0.2);
+    animation:toast-in .25s ease;
+  }
+  .toast.success{background:var(--success);}
+  .toast.error{background:var(--danger);}
+  .toast.fade-out{animation:toast-out .25s ease forwards;}
+  @keyframes toast-in{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  @keyframes toast-out{to{opacity:0; transform:translateY(8px);}}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <h1>চেতনা নিউজ</h1>
+  <p>সম্পাদনা ড্যাশবোর্ড</p>
+</header>
+
+<div class="toolbar">
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="শিরোনাম, ক্যাটাগরি বা জেলা দিয়ে খুঁজুন">
+  </div>
+  <span class="count" id="result-count"></span>
+  <button class="btn-refresh" id="refresh-btn">রিফ্রেশ</button>
+</div>
+
+<!-- Loading skeleton -->
+<div class="container" id="skeleton-grid"></div>
+<p class="loading-hint" id="loading-hint" style="display:none;">খবর লোড হচ্ছে — সার্ভার স্লিপ মোডে থাকলে চালু হতে প্রায় ১ মিনিট সময় লাগতে পারে</p>
+
+<!-- Empty state -->
+<div class="state-panel" id="empty-state">
+  <div class="glyph">🗞️</div>
+  <h2>কোনো খবর পাওয়া যায়নি</h2>
+  <p>ডেটাবেসে এখনও কোনো খবর যোগ করা হয়নি।</p>
+</div>
+
+<!-- Error state -->
+<div class="state-panel" id="error-state">
+  <div class="glyph">⚠️</div>
+  <h2>খবর লোড করা যায়নি</h2>
+  <p>Render লিংকটি ঠিক আছে কিনা দেখুন, অথবা সার্ভার স্লিপ মোডে থাকলে কিছুক্ষণ পর আবার চেষ্টা করুন।</p>
+  <button class="btn-retry" id="retry-btn">আবার চেষ্টা করুন</button>
+</div>
+
+<!-- News grid -->
+<div class="container" id="news-container" style="display:none;"></div>
+
+<!-- Edit modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-box">
+    <h3>খবর এডিট করুন</h3>
+    <input type="hidden" id="edit-id">
+
+    <div class="field">
+      <label for="edit-headline">হেডলাইন</label>
+      <input type="text" id="edit-headline" placeholder="খবরের শিরোনাম">
+    </div>
+
+    <div class="field">
+      <label for="edit-body">বিস্তারিত</label>
+      <textarea id="edit-body" rows="4" placeholder="খবরের বিস্তারিত অংশ"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="edit-image">ছবির লিংক</label>
+      <input type="text" id="edit-image" placeholder="ছবির URL">
+      <span class="hint">এই লিংক ওয়েবসাইটে ব্যবহৃত হবে — ড্যাশবোর্ডে ছবি দেখানো হয় না, শুধু লিংক এখান থেকে বদলানো যাবে।</span>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="edit-category">ক্যাটাগরি</label>
+        <select id="edit-category">
+          <option value="">-- ক্যাটাগরি বাছাই করুন --</option>
+          <option value="রাজনীতি">রাজনীতি</option>
+          <option value="খেলা">খেলা</option>
+          <option value="বিনোদন">বিনোদন</option>
+          <option value="আন্তর্জাতিক">আন্তর্জাতিক</option>
+          <option value="জাতীয়">জাতীয়</option>
+          <option value="শিক্ষা">শিক্ষা</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="edit-district">জেলা</label>
+        <select id="edit-district">
+          <option value="">-- জেলা বাছাই করুন --</option>
+          <option value="আলিপুরদুয়ার">আলিপুরদুয়ার</option>
+          <option value="বাঁকুড়া">বাঁকুড়া</option>
+          <option value="বীরভূম">বীরভূম</option>
+          <option value="কোচবিহার">কোচবিহার</option>
+          <option value="দক্ষিণ দিনাজপুর">দক্ষিণ দিনাজপুর</option>
+          <option value="দার্জিলিং">দার্জিলিং</option>
+          <option value="হুগলি">হুগলি</option>
+          <option value="হাওড়া">হাওড়া</option>
+          <option value="জলপাইগুড়ি">জলপাইগুড়ি</option>
+          <option value="ঝাড়গ্রাম">ঝাড়গ্রাম</option>
+          <option value="কালিম্পং">কালিম্পং</option>
+          <option value="কলকাতা">কলকাতা</option>
+          <option value="মালদা">মালদা</option>
+          <option value="মুর্শিদাবাদ">মুর্শিদাবাদ</option>
+          <option value="নদিয়া">নদিয়া</option>
+          <option value="উত্তর ২৪ পরগনা">উত্তর ২৪ পরগনা</option>
+          <option value="পশ্চিম বর্ধমান">পশ্চিম বর্ধমান</option>
+          <option value="পশ্চিম মেদিনীপুর">পশ্চিম মেদিনীপুর</option>
+          <option value="পূর্ব বর্ধমান">পূর্ব বর্ধমান</option>
+          <option value="পূর্ব মেদিনীপুর">পূর্ব মেদিনীপুর</option>
+          <option value="পুরুলিয়া">পুরুলিয়া</option>
+          <option value="দক্ষিণ ২৪ পরগনা">দক্ষিণ ২৪ পরগনা</option>
+          <option value="উত্তর দিনাজপুর">উত্তর দিনাজপুর</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel" id="edit-cancel-btn">বাতিল</button>
+      <button class="btn btn-save" id="save-btn">পরিবর্তন সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-box confirm-box">
+    <h3>খবর ডিলিট করবেন?</h3>
+    <p>"<strong id="delete-headline-preview"></strong>" খবরটি ডিলিট করলে তা আর ফিরিয়ে আনা যাবে না।</p>
+    <div class="modal-actions">
+      <button class="btn btn-cancel" id="delete-cancel-btn">না, থাক</button>
+      <button class="btn btn-danger-solid" id="delete-confirm-btn">হ্যাঁ, ডিলিট করুন</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-stack" id="toast-stack"></div>
+
+<script>
+  // সেশন চেক
+  if (sessionStorage.getItem("csnAdminAuthed") !== "true") {
+    window.location.href = "index.html";
+  }
+
+  const API_URL = "https://news-edit.onrender.com/api/news";
+
+  let allNews = [];
+  let pendingDeleteId = null;
+
+  // Infinite Scroll & Firestore Pagination Vars
+  let lastDocId = null; // offset এর বদলে lastDocId ট্র্যাক রাখা হচ্ছে
+  const LIMIT = 10;
+  let isLoadingMore = false;
+  let hasMoreData = true;
+
+  const el = {
+    skeletonGrid: document.getElementById('skeleton-grid'),
+    loadingHint: document.getElementById('loading-hint'),
+    emptyState: document.getElementById('empty-state'),
+    errorState: document.getElementById('error-state'),
+    container: document.getElementById('news-container'),
+    resultCount: document.getElementById('result-count'),
+    searchInput: document.getElementById('search-input'),
+    refreshBtn: document.getElementById('refresh-btn'),
+    retryBtn: document.getElementById('retry-btn'),
+    editModal: document.getElementById('edit-modal'),
+    deleteModal: document.getElementById('delete-modal'),
+    toastStack: document.getElementById('toast-stack'),
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchNews(true);
+    renderSkeleton();
+    window.addEventListener('scroll', handleScroll);
+  });
+
+  el.refreshBtn.addEventListener('click', () => fetchNews(true));
+  el.retryBtn.addEventListener('click', () => fetchNews(true));
+
+  // সার্চ করার সময় ফিল্টারিং
+  el.searchInput.addEventListener('input', () => {
+    const q = el.searchInput.value.trim().toLocaleLowerCase('bn');
+    if (!q) { 
+      renderNews(allNews, true); 
+      return; 
+    }
+    const filtered = allNews.filter(n =>
+      [n.headline, n.category, n.district].some(f => (f || '').toLocaleLowerCase('bn').includes(q))
+    );
+    renderNews(filtered, true);
+  });
+
+  function handleScroll() {
+    if (el.searchInput.value.trim() !== '') return;
+
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 300) {
+      if (!isLoadingMore && hasMoreData) {
+        fetchNews(false);
+      }
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function renderSkeleton() {
+    el.skeletonGrid.innerHTML = Array.from({ length: 6 }).map(() => `
+      <div class="skeleton-card">
+        <div class="skeleton-line sk-pill"></div>
+        <div class="skeleton-line sk-pill"></div>
+        <div class="skeleton-line sk-title"></div>
+        <div class="skeleton-line sk-text"></div>
+        <div class="skeleton-line sk-text short"></div>
+      </div>
+    `).join('');
+  }
+
+  function showState(state) {
+    el.skeletonGrid.style.display = state === 'loading' ? 'grid' : 'none';
+    el.loadingHint.style.display = state === 'loading' ? 'block' : 'none';
+    el.emptyState.style.display = state === 'empty' ? 'block' : 'none';
+    el.errorState.style.display = state === 'error' ? 'block' : 'none';
+    el.container.style.display = (state === 'data' || state === 'loading-more') ? 'grid' : 'none';
+  }
+
+  async function fetchNews(isInitial = false) {
+    if (isLoadingMore) return;
+    isLoadingMore = true;
+
+    if (isInitial) {
+      lastDocId = null; // রিলোড দিলে রিফোলো করা হচ্ছে
+      allNews = [];
+      hasMoreData = true;
+      showState('loading');
+      el.resultCount.textContent = '';
+      el.container.innerHTML = '';
+    }
+
+    try {
+      // ব্যাকএন্ডে সঠিক lastDocId প্যারামিটার পাঠানো
+      let url = `${API_URL}?limit=${LIMIT}`;
+      if (lastDocId) {
+        url += `&lastDocId=${lastDocId}`;
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Server responded with an error');
+      
+      const data = await response.json();
+      const fetchedNews = data.news || [];
+      
+      // ব্যাকএন্ড থেকে নতুন lastDocId এবং hasMore গ্রহণ
+      lastDocId = data.lastDocId;
+      hasMoreData = data.hasMore;
+
+      allNews = [...allNews, ...fetchedNews];
+
+      if (allNews.length === 0) {
+        showState('empty');
+      } else {
+        // নতুন খবরগুলো নিচে যোগ করা (Append করা)
+        renderNews(fetchedNews, isInitial);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      if (isInitial) showState('error');
+    } finally {
+      isLoadingMore = false;
+    }
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return '';
+    return new Intl.DateTimeFormat('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
+  }
+
+  function renderNews(list, isReplace = false) {
+    showState('data');
+    el.resultCount.textContent = `${allNews.length.toLocaleString('bn-BD')}টি খবর দেখানো হচ্ছে`;
+
+    if (isReplace && list.length === 0) {
+      el.container.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-muted); font-size:14px;">খোঁজার সাথে মিলে এমন কোনো খবর নেই।</p>`;
+      return;
+    }
+
+    const cardsHtml = list.map(news => {
+      const headline = escapeHtml(news.headline || 'শিরোনাম নেই');
+      const body = escapeHtml(news.body || '');
+      const preview = body.length > 110 ? body.slice(0, 110) + '…' : body;
+      const category = escapeHtml(news.category || 'ক্যাটাগরি নেই');
+      const district = escapeHtml(news.district || 'জেলা নেই');
+      const dateLabel = escapeHtml(formatDate(news.createdAt));
+      return `
+        <article class="card" data-id="${escapeHtml(news.id)}">
+          <div class="card-kicker">
+            <span class="pill pill-category">${category}</span>
+            <span class="pill pill-district">${district}</span>
+            ${dateLabel ? `<span class="card-date">${dateLabel}</span>` : ''}
+          </div>
+          <h3>${headline}</h3>
+          <p>${preview}</p>
+          <div class="card-footer">
+            <button class="btn btn-outline-edit" data-action="edit" data-id="${escapeHtml(news.id)}">এডিট</button>
+            <button class="btn btn-outline-delete" data-action="delete" data-id="${escapeHtml(news.id)}">ডিলিট</button>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    if (isReplace) {
+      el.container.innerHTML = cardsHtml;
+    } else {
+      el.container.insertAdjacentHTML('beforeend', cardsHtml);
+    }
+  }
+
+  el.container.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === 'edit') openEditModal(id);
+    if (btn.dataset.action === 'delete') openDeleteConfirm(id);
+  });
+
+  function setSelectValue(selectEl, value) {
+    if (!value) { selectEl.value = ''; return; }
+    const exists = Array.from(selectEl.options).some(o => o.value === value);
+    if (!exists) {
+      const opt = document.createElement('option');
+      opt.value = value;
+      opt.textContent = value;
+      selectEl.appendChild(opt);
+    }
+    selectEl.value = value;
+  }
+
+  function openEditModal(id) {
+    const news = allNews.find(n => n.id === id);
+    if (!news) return;
+    document.getElementById('edit-id').value = news.id;
+    document.getElementById('edit-headline').value = news.headline || '';
+    document.getElementById('edit-body').value = news.body || '';
+    document.getElementById('edit-image').value = news.image || '';
+    setSelectValue(document.getElementById('edit-category'), news.category || '');
+    setSelectValue(document.getElementById('edit-district'), news.district || '');
+    el.editModal.classList.add('open');
+    document.getElementById('edit-headline').focus();
+  }
+
+  function closeEditModal() {
+    el.editModal.classList.remove('open');
+  }
+  document.getElementById('edit-cancel-btn').addEventListener('click', closeEditModal);
+
+  document.getElementById('save-btn').addEventListener('click', async () => {
+    const saveBtn = document.getElementById('save-btn');
+    const originalLabel = saveBtn.textContent;
+    saveBtn.textContent = 'সংরক্ষণ হচ্ছে...';
+    saveBtn.disabled = true;
+
+    const id = document.getElementById('edit-id').value;
+    const payload = {
+      headline: document.getElementById('edit-headline').value,
+      body: document.getElementById('edit-body').value,
+      image: document.getElementById('edit-image').value,
+      category: document.getElementById('edit-category').value,
+      district: document.getElementById('edit-district').value
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!response.ok) throw new Error('Update failed');
+      showToast('খবরটি সফলভাবে আপডেট হয়েছে', 'success');
+      closeEditModal();
+      fetchNews(true);
+    } catch (error) {
+      console.error(error);
+      showToast('আপডেট করা যায়নি, আবার চেষ্টা করুন', 'error');
+    } finally {
+      saveBtn.textContent = originalLabel;
+      saveBtn.disabled = false;
+    }
+  });
+
+  function openDeleteConfirm(id) {
+    const news = allNews.find(n => n.id === id);
+    if (!news) return;
+    pendingDeleteId = id;
+    document.getElementById('delete-headline-preview').textContent = news.headline || 'শিরোনাম নেই';
+    el.deleteModal.classList.add('open');
+  }
+
+  function closeDeleteConfirm() {
+    el.deleteModal.classList.remove('open');
+    pendingDeleteId = null;
+  }
+  document.getElementById('delete-cancel-btn').addEventListener('click', closeDeleteConfirm);
+
+  document.getElementById('delete-confirm-btn').addEventListener('click', async () => {
+    if (!pendingDeleteId) return;
+    const id = pendingDeleteId;
+    const confirmBtn = document.getElementById('delete-confirm-btn');
+    confirmBtn.textContent = 'ডিলিট হচ্ছে...';
+    confirmBtn.disabled = true;
+
+    try {
+      const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Delete failed');
+      showToast('খবরটি ডিলিট হয়েছে', 'success');
+      closeDeleteConfirm();
+      fetchNews(true);
+    } catch (error) {
+      console.error(error);
+      showToast('ডিলিট করা যায়নি', 'error');
+    } finally {
+      confirmBtn.textContent = 'হ্যাঁ, ডিলিট করুন';
+      confirmBtn.disabled = false;
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeEditModal();
+      closeDeleteConfirm();
+    }
+  });
+
+  function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    el.toastStack.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('fade-out');
+      setTimeout(() => toast.remove(), 250);
+    }, 3200);
+  }
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSN News Admin | চেতনা নিউজ কন্ট্রোল প্যানেল</title>
+
+<!-- Google Fonts: Hind Siliguri for Bengali content, Poppins for UI chrome -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SCREEN — DASHBOARD (ড্যাশবোর্ড স্ক্রিন)
+============================================================= -->
+<section id="dashboardScreen" class="screen active">
+  <header class="topbar">
+    <div class="topbar-brand">
+      <img src="your-logo.png" alt="CSN Logo" class="brand-mark brand-mark-sm" onerror="this.onerror=null; this.src='';">
+      <div class="brand-text">
+        <h1>চেতনা নিউজ</h1>
+        <p>Admin Dashboard</p>
+      </div>
+    </div>
+    
+    <!-- Right side: Circular Profile Menu & Dropdown -->
+    <div class="topbar-actions">
+      <div class="profile-container">
+        <button type="button" class="profile-trigger" id="profileMenuBtn" aria-label="Admin Menu">
+          <span>A</span>
+        </button>
+        
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="dropdown-header">
+            <h4>System Admin</h4>
+            <p>admin.chetananews.com</p>
+          </div>
+          <div class="dropdown-divider"></div>
+          
+          <button type="button" class="dropdown-item" id="dropdownEditBtn">
+            <span class="item-icon">✏️</span>
+            <span class="item-text">Edit / এডিট</span>
+          </button>
+
+          <button type="button" class="dropdown-item" id="dropdownHelpBtn">
+            <span class="item-icon">❓</span>
+            <span class="item-text">Help / সাহায্য</span>
+          </button>
+          <button type="button" class="dropdown-item text-danger" id="dropdownLogoutBtn">
+            <span class="item-icon">🚪</span>
+            <span class="item-text">Logout / লগ আউট</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-grid">
+
+    <!-- LEFT — FORM PANEL -->
+    <div class="panel form-panel">
+      <h2 class="panel-title">Create New Post (নতুন সংবাদ)</h2>
+      <p class="panel-subtitle">Fill up form and preview live on right side</p>
+
+      <form id="postForm" novalidate>
+
+        <div class="field">
+          <label for="headline">News Headline (শিরোনাম)</label>
+          <input type="text" id="headline" name="headline" placeholder="সংবাদের শিরোনাম লিখুন" required>
+        </div>
+
+        <div class="field">
+          <label for="body">News Body (বিস্তারিত সংবাদ)</label>
+          <textarea id="body" name="body" rows="6" placeholder="সংবাদের সম্পূর্ণ বিবরণ লিখুন..." required></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="category">Category (বিভাগ)</label>
+            <select id="category" name="category" required>
+              <option value="" disabled selected>-- Select --</option>
+              <option value="রাজনীতি">রাজনীতি</option>
+              <option value="খেলা">খেলা</option>
+              <option value="বিনোদন">বিনোদন</option>
+              <option value="আন্তর্জাতিক">আন্তর্জাতিক</option>
+              <option value="জাতীয়">জাতীয়</option>
+              <option value="শিক্ষা">শিক্ষা</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="district">District (জেলা)</label>
+            <select id="district" name="district" required>
+              <option value="" disabled selected>-- Select --</option>
+              <option value="আলিপুরদুয়ার">আলিপুরদুয়ার</option>
+              <option value="বাঁকুড়া">বাঁকুড়া</option>
+              <option value="বীরভূম">বীরভূম</option>
+              <option value="কোচবিহার">কোচবিহার</option>
+              <option value="দক্ষিণ দিনাজপুর">দক্ষিণ দিনাজপুর</option>
+              <option value="দার্জিলিং">দার্জিলিং</option>
+              <option value="হুগলি">হুগলি</option>
+              <option value="হাওড়া">হাওড়া</option>
+              <option value="জলপাইগুড়ি">জলপাইগুড়ি</option>
+              <option value="ঝাড়গ্রাম">ঝাড়গ্রাম</option>
+              <option value="কলকাতা">কলকাতা</option>
+              <option value="মালদা">মালদা</option>
+              <option value="মুর্শিদাবাদ">মুর্শিদাবাদ</option>
+              <option value="নদিয়া">নদিয়া</option>
+              <option value="উত্তর ২৪ পরগনা">উত্তর ২৪ পরগনা</option>
+              <option value="পশ্চিম বর্ধমান">পশ্চিম বর্ধমান</option>
+              <option value="পশ্চিম মেদিনীপুর">পশ্চিম মেদিনীপুর</option>
+              <option value="পূর্ব বর্ধমান">পূর্ব বর্ধমান</option>
+              <option value="পূর্ব মেদিনীপুর">পূর্ব মেদিনীপুর</option>
+              <option value="পুরুলিয়া">পুরুলিয়া</option>
+              <option value="দক্ষিণ ২৪ পরগনা">দক্ষিণ ২৪ পরগনা</option>
+              <option value="উত্তর দিনাজপুর">উত্তর দিনাজপুর</option>
+              <option value="কালিম্পং">কালিম্পং</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="editor">Editor Name (সম্পাদক)</label>
+            <input type="text" id="editor" name="editor" placeholder="সম্পাদকের নাম" required>
+          </div>
+
+          <div class="field">
+            <label for="postDate">Publish Date (তারিখ)</label>
+            <div class="locked-field">
+              <input type="text" id="postDate" name="date" readonly>
+              <span class="lock-icon" aria-hidden="true">🔒</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="image">Featured Image (প্রচ্ছদ ছবি) <span class="hint">(Max 1.5 MB)</span></label>
+          <div class="file-input-wrap">
+            <label for="image" class="btn btn-outline file-btn">Upload Image</label>
+            <input type="file" id="image" name="image" accept="image/*" hidden required>
+            <span id="fileNameDisplay" class="file-name">No file chosen</span>
+          </div>
+          <div id="imageAlert" class="alert" hidden></div>
+        </div>
+
+        <div id="formAlert" class="alert" hidden></div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+          <span id="submitBtnText">Publish Post / প্রকাশ করুন</span>
+          <span class="spinner" id="submitSpinner" hidden></span>
+        </button>
+      </form>
+    </div>
+
+    <!-- RIGHT — LIVE PREVIEW PANEL -->
+    <div class="panel preview-panel">
+      <div class="browser-chrome">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+        <span class="browser-url">chetananews.com/live-preview</span>
+        <span class="live-indicator"><span class="pulse-dot"></span>PREVIEW</span>
+      </div>
+
+      <article class="preview-card">
+        <div class="preview-badges">
+          <span id="previewCategory" class="badge badge-category">বিভাগ</span>
+          <span id="previewDistrict" class="badge badge-district">জেলা</span>
+        </div>
+
+        <div class="preview-image-wrap" id="previewImageWrap">
+          <img id="previewImage" alt="প্রিভিউ ছবি" hidden>
+          <span id="previewPlaceholder" class="preview-placeholder">Featured image will appear here</span>
+        </div>
+
+        <h3 id="previewHeadline" class="preview-headline">এখানে শিরোনাম দেখা যাবে</h3>
+        <p id="previewBody" class="preview-body">সংবাদের বিবরণ এখানে সরাসরি প্রদর্শিত হবে যখন আপনি বাম পাশে টাইপ করবেন।</p>
+
+        <div class="preview-meta">
+          <span id="previewEditor">সম্পাদক: —</span>
+          <span id="previewDate">—</span>
+        </div>
+      </article>
+    </div>
+
+  </main>
+
+  <footer class="page-footer dashboard-footer">
+    <span>&copy; <span id="footerYear"></span> CSN News — Portal Admin</span>
+    <button type="button" class="link-btn" id="helpLinkFooter">Help / সাহায্য</button>
+  </footer>
+</section>
+
+<!-- ============================================================
+     PROGRESS MODAL — UPLOAD PROGRESS & SUCCESS
+============================================================= -->
+<div id="progressModal" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+
+    <div class="modal-card__glow" aria-hidden="true"></div>
+
+    <!-- UPLOADING STATE -->
+    <div class="modal-progress-stage" id="modalProgressStage">
+
+      <div id="modalRingContainer" class="progress-ring-container">
+        <svg class="progress-ring" viewBox="0 0 140 140" width="140" height="140">
+          <defs>
+            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff6b5f"/>
+              <stop offset="55%" stop-color="#dc2626"/>
+              <stop offset="100%" stop-color="#8f1616"/>
+            </linearGradient>
+            <filter id="ringGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3.2" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <circle class="progress-ring__track" cx="70" cy="70" r="60"/>
+          <circle id="progressRingBar" class="progress-ring__bar" cx="70" cy="70" r="60"/>
+        </svg>
+        <div class="progress-ring__center">
+          <span id="modalProgressText" class="progress-ring__text">0%</span>
+          <span class="progress-ring__label">আপলোড হচ্ছে</span>
+        </div>
+      </div>
+
+      <div id="modalProgressBarContainer" class="linear-progress">
+        <div id="modalProgressBarFill" class="linear-progress__fill" style="width:0%"></div>
+        <div class="linear-progress__sheen" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <!-- SUCCESS ICON -->
+    <div id="modalSuccessIcon" class="status-icon status-icon--success" hidden>
+      <svg viewBox="0 0 100 100" width="88" height="88">
+        <circle class="status-icon__ring" cx="50" cy="50" r="45"/>
+        <path class="status-icon__check" d="M28 52 L43 67 L74 34"/>
+      </svg>
+    </div>
+
+    <!-- ERROR ICON -->
+    <div id="modalErrorIcon" class="status-icon status-icon--error" hidden>
+      <svg viewBox="0 0 100 100" width="88" height="88">
+        <circle class="status-icon__ring status-icon__ring--error" cx="50" cy="50" r="45"/>
+        <path class="status-icon__cross" d="M35 35 L65 65"/>
+        <path class="status-icon__cross" d="M65 35 L35 65"/>
+      </svg>
+    </div>
+
+    <!-- STATUS TEXT -->
+    <h2 id="modalTitle" class="modal-title">সংবাদ প্রকাশ করা হচ্ছে...</h2>
+    <p id="modalSubtitle" class="modal-subtitle">অনুগ্রহ করে অপেক্ষা করুন, আপনার সংবাদটি সার্ভারে পাঠানো হচ্ছে।</p>
+
+    <!-- SUCCESS ACTIONS -->
+    <div id="modalSuccessActions" class="modal-actions" hidden>
+      <a id="channelLink" href="https://chetananews.com/" target="_blank" rel="noopener" class="btn btn--ghost">
+        <span class="btn__globe" aria-hidden="true">
+          <span class="btn__globe-ring"></span>
+          <span class="btn__globe-dot"></span>
+        </span>
+        চ্যানেলে দেখুন
+      </a>
+      <button id="modalSuccessCloseBtn" type="button" class="btn btn--primary">
+        সম্পন্ন
+      </button>
+    </div>
+
+    <!-- ERROR ACTIONS -->
+    <div id="modalErrorActions" class="modal-actions" hidden>
+      <button id="modalErrorCloseBtn" type="button" class="btn btn--danger">
+        বন্ধ করুন
+      </button>
+    </div>
+
+  </div>
+
+  <audio id="successAudio" preload="auto">
+    <source src="success.mp3" type="audio/mpeg">
+  </audio>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

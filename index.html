@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSN News Admin | Login</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<section id="loginScreen" class="login-wrapper">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="your-logo.png" alt="CSN Logo" class="brand-mark" id="loginLogo" onerror="this.onerror=null; this.src='';">
+      <div class="brand-text">
+        <h1>চেতনা নিউজ</h1>
+        <p>Admin Portal</p>
+      </div>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="loginUsername">Username / ইউজারনেম</label>
+        <input type="text" id="loginUsername" autocomplete="username" placeholder="অ্যাডমিন ইউজারনেম" required>
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password / পাসওয়ার্ড</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••" required>
+      </div>
+
+      <div id="loginAlert" class="alert" hidden></div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="loginSubmitBtn">
+        <span id="loginBtnText">Login / প্রবেশ করুন</span>
+        <span class="spinner" id="loginSpinner" hidden></span>
+      </button>
+    </form>
+
+    <footer class="page-footer">
+      <button type="button" class="link-btn" id="helpLinkLogin">Need Help / সাহায্য প্রয়োজন?</button>
+    </footer>
+  </div>
+</section>
+
+<script src="index.js"></script>
+</body>
+</html>
