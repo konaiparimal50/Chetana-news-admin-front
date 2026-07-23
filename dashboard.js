@@ -4,7 +4,7 @@
 
 // ১. নিরাপত্তা যাচাইকরণ (লগইন করা না থাকলে login.html এ পাঠিয়ে দেওয়া হবে)
 if (sessionStorage.getItem("csnAdminAuthed") !== "true") {
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 const CONFIG = {
@@ -102,7 +102,7 @@ helpLinkFooter.addEventListener("click", () => {
 function triggerLogout() {
   sessionStorage.removeItem("csnAdminAuthed");
   localStorage.removeItem("csnEditorName");
-  window.location.href = "login.html";
+  window.location.href = "index.html";
 }
 
 function showAlert(el, message, type) {
