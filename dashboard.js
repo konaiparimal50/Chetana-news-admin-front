@@ -29,9 +29,18 @@ const categorySelect = document.getElementById("category");
 const districtSelect = document.getElementById("district");
 const editorInput = document.getElementById("editor");
 const postDateInput = document.getElementById("postDate");
+
+// ইমেজ ১ এলিমেন্ট
 const imageInput = document.getElementById("image");
 const fileNameDisplay = document.getElementById("fileNameDisplay");
 const imageAlert = document.getElementById("imageAlert");
+
+// ইমেজ ২ এলিমেন্ট (নতুন)
+const image2Container = document.getElementById("image2Container");
+const image2Input = document.getElementById("image2");
+const fileNameDisplay2 = document.getElementById("fileNameDisplay2");
+const imageAlert2 = document.getElementById("imageAlert2");
+
 const formAlert = document.getElementById("formAlert");
 
 // লাইভ প্রিভিউ এলিমেন্ট
@@ -106,11 +115,13 @@ function triggerLogout() {
 }
 
 function showAlert(el, message, type) {
+  if(!el) return;
   el.textContent = message;
   el.className = `alert alert-${type}`;
   el.hidden = false;
 }
 function hideAlert(el) {
+  if(!el) return;
   el.hidden = true;
   el.textContent = "";
 }
@@ -139,14 +150,32 @@ function updatePreviewDate(isoDate) {
   previewDate.textContent = isoDate ? toBengaliDate(isoDate) : "—";
 }
 
-// লাইভ প্রিভিউ লজিক
+// লাইভ প্রিভিউ লজিক (নতুন ইমেজ ২ ইনজেকশন সহ)
+function updateBodyPreview() {
+  const text = bodyInput.value.trim() || "সংবাদের বিবরণ এখানে সরাসরি প্রদর্শিত হবে যখন আপনি বাম পাশে টাইপ করবেন।";
+  
+  if (image2Input && image2Input.files && image2Input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const middleIndex = Math.floor(text.length / 2);
+      const splitIndex = text.indexOf(" ", middleIndex) !== -1 ? text.indexOf(" ", middleIndex) : middleIndex;
+      
+      const part1 = text.substring(0, splitIndex);
+      const part2 = text.substring(splitIndex);
+      
+      previewBody.innerHTML = `${part1}<br><br><img src="${e.target.result}" alt="News Image 2" style="width:100%; border-radius:8px; margin: 10px 0;"><br><br>${part2}`;
+    };
+    reader.readAsDataURL(image2Input.files[0]);
+  } else {
+    previewBody.textContent = text;
+  }
+}
+
 headlineInput.addEventListener("input", () => {
   previewHeadline.textContent = headlineInput.value.trim() || "এখানে শিরোনাম দেখা যাবে";
 });
 
-bodyInput.addEventListener("input", () => {
-  previewBody.textContent = bodyInput.value.trim() || "সংবাদের বিবরণ এখানে সরাসরি প্রদর্শিত হবে যখন আপনি বাম পাশে টাইপ করবেন।";
-});
+bodyInput.addEventListener("input", updateBodyPreview);
 
 categorySelect.addEventListener("change", () => {
   previewCategory.textContent = categorySelect.value || "বিভাগ";
@@ -160,7 +189,7 @@ editorInput.addEventListener("input", () => {
   previewEditor.textContent = `সম্পাদক: ${editorInput.value.trim() || "—"}`;
 });
 
-// ছবি হ্যান্ডলার
+// প্রথম ছবি হ্যান্ডলার
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
   hideAlert(imageAlert);
@@ -168,6 +197,7 @@ imageInput.addEventListener("change", () => {
   if (!file) {
     fileNameDisplay.textContent = "No file chosen";
     clearPreviewImage();
+    if(image2Container) image2Container.hidden = true; // প্রথমটা না থাকলে দ্বিতীয় অপশন লুকানো থাকবে
     return;
   }
 
@@ -176,10 +206,12 @@ imageInput.addEventListener("change", () => {
     imageInput.value = "";
     fileNameDisplay.textContent = "No file chosen";
     clearPreviewImage();
+    if(image2Container) image2Container.hidden = true;
     return;
   }
 
   fileNameDisplay.textContent = file.name;
+  if(image2Container) image2Container.hidden = false; // সফলভাবে প্রথমটা দিলে দ্বিতীয় অপশন দেখাবে
 
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -189,6 +221,31 @@ imageInput.addEventListener("change", () => {
   };
   reader.readAsDataURL(file);
 });
+
+// দ্বিতীয় ছবি হ্যান্ডলার (ঐচ্ছিক)
+if(image2Input) {
+  image2Input.addEventListener("change", () => {
+    const file = image2Input.files[0];
+    hideAlert(imageAlert2);
+
+    if (!file) {
+      fileNameDisplay2.textContent = "No file chosen";
+      updateBodyPreview();
+      return;
+    }
+
+    if (file.size > CONFIG.MAX_IMAGE_BYTES) {
+      showAlert(imageAlert2, "ছবির আকার ১.৫ MB এর বেশি হতে পারবে না।", "error");
+      image2Input.value = "";
+      fileNameDisplay2.textContent = "No file chosen";
+      updateBodyPreview();
+      return;
+    }
+
+    fileNameDisplay2.textContent = file.name;
+    updateBodyPreview(); // দ্বিতীয় ছবি সিলেক্ট হলে টেক্সটের মাঝে প্রিভিউ আপডেট হবে
+  });
+}
 
 function clearPreviewImage() {
   previewImage.src = "";
@@ -327,7 +384,14 @@ postForm.addEventListener("submit", async (e) => {
   formData.append("district", districtSelect.value);
   formData.append("editor", editorInput.value.trim());
   formData.append("date", postDateInput.value);
+  
+  // প্রথম ইমেজ যুক্ত করা হলো
   formData.append("image", imageInput.files[0]);
+  
+  // দ্বিতীয় ইমেজ থাকলে যুক্ত করা হবে
+  if (image2Input && image2Input.files[0]) {
+    formData.append("image2", image2Input.files[0]);
+  }
 
   try {
     const response = await fetch(CONFIG.RENDER_API_URL, {
@@ -353,6 +417,13 @@ function resetPostForm() {
   fileNameDisplay.textContent = "No file chosen";
   hideAlert(imageAlert);
   clearPreviewImage();
+  
+  // ইমেজ ২ এর ডেটা রিসেট
+  if(image2Input) image2Input.value = "";
+  if(fileNameDisplay2) fileNameDisplay2.textContent = "No file chosen";
+  if(image2Container) image2Container.hidden = true;
+  hideAlert(imageAlert2);
+  
   previewHeadline.textContent = "এখানে শিরোনাম দেখা যাবে";
   previewBody.textContent = "সংবাদের বিবরণ এখানে সরাসরি প্রদর্শিত হবে যখন আপনি বাম পাশে টাইপ করবেন।";
   previewCategory.textContent = "বিভাগ";
@@ -374,6 +445,6 @@ function loadDashboardData() {
 
 // ইনিশিয়ালাইজেশন
 (function init() {
-  footerYear.textContent = new Date().getFullYear();
+  if(footerYear) footerYear.textContent = new Date().getFullYear();
   loadDashboardData();
 })();
