@@ -2,8 +2,9 @@
    CSN NEWS ADMIN — DASHBOARD LOGIC (dashboard.js)
 ============================================================= */
 
-// ১. নিরাপত্তা যাচাইকরণ (লগইন করা না থাকলে login.html এ পাঠিয়ে দেওয়া হবে)
-if (sessionStorage.getItem("csnAdminAuthed") !== "true") {
+// ১. নিরাপত্তা যাচাইকরণ (টোকেন না থাকলে index.html এ পাঠিয়ে দেওয়া হবে)
+const authToken = localStorage.getItem("csnAuthToken");
+if (!authToken) {
   window.location.href = "index.html";
 }
 
