@@ -10,9 +10,11 @@
      লগইন করা না থাকলে সরাসরি login.html পেজে রিডাইরেক্ট করবে
 ============================================================= -->
 <script>
-  if (sessionStorage.getItem("csnAdminAuthed") !== "true") {
-    window.location.href = "index.html";
-  }
+// ১. নিরাপত্তা যাচাইকরণ (টোকেন না থাকলে index.html এ পাঠিয়ে দেওয়া হবে)
+const authToken = localStorage.getItem("csnAuthToken");
+if (!authToken) {
+  window.location.href = "index.html";
+}
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
