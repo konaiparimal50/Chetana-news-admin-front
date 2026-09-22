@@ -5,17 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>চেতনা নিউজ — সম্পাদনা ড্যাশবোর্ড</title>
 
-<!-- ============================================================
-     AUTHENTICATION CHECK
-     লগইন করা না থাকলে সরাসরি login.html পেজে রিডাইরেক্ট করবে
-============================================================= -->
-<script>
-// ১. নিরাপত্তা যাচাইকরণ (টোকেন না থাকলে index.html এ পাঠিয়ে দেওয়া হবে)
-const authToken = localStorage.getItem("csnAuthToken");
-if (!authToken) {
-  window.location.href = "index.html";
-}
-</script>
+
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -465,10 +455,12 @@ if (!authToken) {
 <div class="toast-stack" id="toast-stack"></div>
 
 <script>
-  // সেশন চেক
-  if (sessionStorage.getItem("csnAdminAuthed") !== "true") {
-    window.location.href = "index.html";
-  }
+  // edit.html এর <script> ট্যাগের শুরুতে এটি বসান:
+const authToken = localStorage.getItem("csnAuthToken");
+if (!authToken) {
+  window.location.href = "index.html";
+}
+
 
   const API_URL = "https://cns-news-admin.onrender.com/api/news";
 
